@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All-in-One</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0d6efd" />
+  <style>
+    /* Chuyển font đẹp và dễ đọc */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      padding: 2rem;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    h1, h2 {
+      color: #f0f0f0;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    }
+
+    .section {
+      margin-bottom: 3rem;
+      background: #1f1f1f;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.7);
+      transition: background-color 0.4s ease;
+    }
+
+    input.form-control {
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      color: #ddd;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    input.form-control::placeholder {
+      color: #777;
+    }
+    input.form-control:focus {
+      background-color: #3a3a3a;
+      border-color: #66bb6a;
+      color: #eee;
+      box-shadow: 0 0 8px #66bb6a;
+    }
+
+    button.btn-primary {
+      background-color: #66bb6a;
+      border-color: #66bb6a;
+      transition: background-color 0.3s ease;
+    }
+    button.btn-primary:hover {
+      background-color: #58a05d;
+      border-color: #58a05d;
+    }
+
+    #cryptoList {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    #cryptoList li {
+      padding: 4px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    img {
+      border-radius: 8px;
+      max-width: 100%;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.7);
+      transition: transform 0.3s ease;
+    }
+    img:hover {
+      transform: scale(1.05);
+    }
+
+    blockquote {
+      font-size: 1.3rem;
+      font-style: italic;
+      border-left: 5px solid #66bb6a;
+      padding-left: 1rem;
+      color: #a5d6a7;
+      margin: 0;
+    }
+
+    /* QR image */
+    #qrImg {
+      margin-top: 1rem;
+      border: 3px solid #66bb6a;
+      border-radius: 12px;
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Chart container */
+    #cryptoChart {
+      background: #2a2a2a;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.7);
+      margin-bottom: 2rem;
+    }
+
+    /* Dark mode toggle button */
+    #themeToggleBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #66bb6a;
+      border: none;
+      color: #121212;
+      font-weight: 700;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(102, 187, 106, 0.7);
+      transition: background-color 0.3s ease;
+      z-index: 9999;
+      user-select: none;
+    }
+    #themeToggleBtn:hover {
+      background-color: #58a05d;
+      color: #f0f0f0;
+    }
+    /* Responsive cho điện thoại */
+    @media (max-width: 576px) {
+      body {
+        padding: 1rem;
+        font-size: 14px;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      h2 {
+        font-size: 1.2rem;
+      }
+      .section {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      input.form-control,
+      button.btn-primary {
+        width: 100%;
+        font-size: 1rem;
+      }
+      #cryptoChart {
+        height: 200px !important;
+        width: 100% !important;
+      }
+      img#catImg, 
+      .section img {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+      }
+      #themeToggleBtn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+        top: 10px;
+        right: 10px;
+      }
+    }
+  </style>
+</head>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker registered.', reg))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
+<body class="dark-theme">
+
+  <div class="container">
+
+    <!-- Crypto Prices -->
+    <div class="section" id="cryptoSection">
+      <h2>📈 Giá Crypto (CoinGecko)</h2>
+      <ul id="cryptoList"></ul>
+      <canvas id="cryptoChart" height="100"></canvas>
+    </div>
+
+    <!-- Random Cat Image -->
+    <div class="section">
+      <h2>🐱 Ảnh Mèo Random</h2>
+      <img id="catImg" class="img-fluid rounded border" alt="Random Cat" />
+    </div>
+
+    <!-- Advice -->
+    <div class="section">
+      <h2>💡 Lời khuyên trong ngày</h2>
+      <blockquote id="advice" class="blockquote"></blockquote>
+    </div>
+
+    <!-- Joke -->
+    <div class="section">
+      <h2>🤣 Truyện Cười</h2>
+      <p id="joke"></p>
+    </div>
+
+    <!-- Country Info (mặc định Việt Nam) -->
+    <div class="section">
+      <h2>🌍 Thông tin quốc gia (Mặc định Việt Nam)</h2>
+      <div id="country"></div>
+    </div>
+
+    <!-- QR Generator -->
+    <div class="section">
+      <h2>🔲 Tạo mã QR</h2>
+      <input id="qrText" class="form-control mb-2" placeholder="Nhập nội dung..." />
+      <button onclick="generateQR()" class="btn btn-primary">Tạo QR</button>
+      <br />
+      <img id="qrImg" src="./icons/icon-192.png" alt="QR Code" />
+    </div>
+  </div>
+
+  <script>
+    // Dark mode toggle logic
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const body = document.body;
+
+
+    const savedTheme = localStorage.getItem('darkTheme');
+    if (savedTheme === 'false') {
+      body.classList.remove('dark-theme');
+      themeToggleBtn.textContent = 'Dark Mode';
+    }
+
+    // Load Crypto Prices
+    const coins = ['bitcoin', 'ethereum', 'binancecoin', 'dogecoin', 'solana', 'cardano'];
+    function loadCrypto() {
+      fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(',')}&vs_currencies=usd`)
+        .then(res => res.json())
+        .then(data => {
+          const ul = document.getElementById('cryptoList');
+          ul.innerHTML = '';
+          const labels = [];
+          const prices = [];
+          for (const [coin, val] of Object.entries(data)) {
+            const li = document.createElement('li');
+            li.innerText = `${coin.toUpperCase()}: $${val.usd}`;
+            ul.appendChild(li);
+            labels.push(coin.toUpperCase());
+            prices.push(val.usd);
+          }
+          new Chart(document.getElementById('cryptoChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Giá (USD)',
+                data: prices,
+                backgroundColor: 'rgba(102, 187, 106, 0.7)',
+                borderColor: 'rgba(76, 175, 80, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        });
+    }
+    loadCrypto();
+
+    // Load Random Cat Image
+    function loadCat() {
+      fetch('https://api.thecatapi.com/v1/images/search')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('catImg').src = data[0].url;
+        });
+    }
+    loadCat();
+
+    // Load Advice
+    function loadAdvice() {
+      fetch('https://api.adviceslip.com/advice')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('advice').innerText = data.slip.advice;
+        });
+    }
+    loadAdvice();
+
+    // Load Joke
+    function loadJoke() {
+      fetch('https://v2.jokeapi.dev/joke/Any?safe-mode')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('joke').innerText = data.type === 'single' ? data.joke : `${data.setup} - ${data.delivery}`;
+        });
+    }
+    loadJoke();
+
+    // Load Country Info Mặc định Việt Nam
+    function loadCountry() {
+      fetch(`https://restcountries.com/v3.1/name/vietnam`)
+        .then(res => res.json())
+        .then(data => {
+          const c = data[0];
+          document.getElementById('country').innerHTML = `
+            <b>Tên:</b> ${c.name.common}<br>
+            <b>Dân số:</b> ${c.population.toLocaleString()}<br>
+            <b>Khu vực:</b> ${c.region}<br>
+            <b>Quốc kỳ:</b><br><img src="${c.flags.svg}" width="100" alt="Flag of ${c.name.common}">`;
+        })
+        .catch(() => {
+          document.getElementById('country').innerText = 'Không thể tải thông tin quốc gia';
+        });
+    }
+    loadCountry();
+
+    // QR Code Generator
+    function generateQR() {
+      const text = document.getElementById('qrText').value;
+      if (!text) {
+        alert('Vui lòng nhập nội dung để tạo QR Code!');
+        return;
+      }
+      const url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(text)}`;
+      document.getElementById('qrImg').src = url;
+    }
+  </script>
+</body>
+</html>
